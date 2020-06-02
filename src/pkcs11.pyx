@@ -9,10 +9,97 @@ from .types cimport *
 
 LOGGER = logging.getLogger(__name__)
 
+cdef CK_FUNCTION_LIST* functionList
+
+cdef extern CK_RV C_Initialize (void*)
+cdef extern CK_RV C_Finalize (void*)
+cdef extern CK_RV C_GetFunctionList (CK_FUNCTION_LIST * *)
+
+cdef public CK_RV _C_GetFunctionList   (   CK_FUNCTION_LIST * * ppFunctionList  ):
+  global functionList
+  try:
+    print("C_GetFunctionList")
+    if functionList == NULL:
+      functionList = <CK_FUNCTION_LIST*>malloc(sizeof(CK_FUNCTION_LIST))
+      functionList.version.major = 2
+      functionList.version.minor = 40
+      functionList.C_Initialize = &C_Initialize
+      functionList.C_Finalize = &C_Finalize
+      functionList.C_GetInfo = &C_GetInfo
+      functionList.C_GetFunctionList = &C_GetFunctionList
+      functionList.C_GetSlotList = &C_GetSlotList
+      functionList.C_GetSlotInfo = &C_GetSlotInfo
+      functionList.C_GetTokenInfo = &C_GetTokenInfo
+      functionList.C_GetMechanismList = &C_GetMechanismList
+      functionList.C_GetMechanismInfo = &C_GetMechanismInfo
+      # functionList.C_InitToken = &C_InitToken
+      # functionList.C_InitPIN = &C_InitPIN
+      # functionList.C_SetPIN = &C_SetPIN
+      functionList.C_OpenSession = &C_OpenSession
+      functionList.C_CloseSession = &C_CloseSession
+      # functionList.C_CloseAllSessions = &C_CloseAllSessions
+      # functionList.C_GetSessionInfo = &C_GetSessionInfo
+      # functionList.C_GetOperationState = &C_GetOperationState
+      # functionList.C_SetOperationState = &C_SetOperationState
+      functionList.C_Login = &C_Login
+      functionList.C_Logout = &C_Logout
+      functionList.C_CreateObject = &C_CreateObject
+      functionList.C_CopyObject = &C_CopyObject
+      functionList.C_DestroyObject = &C_DestroyObject
+      # functionList.C_GetObjectSize = &C_GetObjectSize
+      functionList.C_GetAttributeValue = &C_GetAttributeValue
+      functionList.C_SetAttributeValue = &C_SetAttributeValue
+      functionList.C_FindObjectsInit = &C_FindObjectsInit
+      functionList.C_FindObjects = &C_FindObjects
+      functionList.C_FindObjectsFinal = &C_FindObjectsFinal
+      functionList.C_EncryptInit = &C_EncryptInit
+      functionList.C_Encrypt = &C_Encrypt
+      functionList.C_EncryptUpdate = &C_EncryptUpdate
+      functionList.C_EncryptFinal = &C_EncryptFinal
+      functionList.C_DecryptInit = &C_DecryptInit
+      functionList.C_Decrypt = &C_Decrypt
+      functionList.C_DecryptUpdate = &C_DecryptUpdate
+      functionList.C_DecryptFinal = &C_DecryptFinal
+      functionList.C_DigestInit = &C_DigestInit
+      functionList.C_Digest = &C_Digest
+      functionList.C_DigestUpdate = &C_DigestUpdate
+      functionList.C_DigestKey = &C_DigestKey
+      functionList.C_DigestFinal = &C_DigestFinal
+      functionList.C_SignInit = &C_SignInit
+      functionList.C_Sign = &C_Sign
+      functionList.C_SignUpdate = &C_SignUpdate
+      functionList.C_SignFinal = &C_SignFinal
+      # functionList.C_SignRecoverInit = &C_SignRecoverInit
+      # functionList.C_SignRecover = &C_SignRecover
+      functionList.C_VerifyInit = &C_VerifyInit
+      functionList.C_Verify = &C_Verify
+      functionList.C_VerifyUpdate = &C_VerifyUpdate
+      functionList.C_VerifyFinal = &C_VerifyFinal
+      # functionList.C_VerifyRecoverInit = &C_VerifyRecoverInit
+      # functionList.C_VerifyRecover = &C_VerifyRecover
+      # functionList.C_DigestEncryptUpdate = &C_DigestEncryptUpdate
+      # functionList.C_DecryptDigestUpdate = &C_DecryptDigestUpdate
+      # functionList.C_SignEncryptUpdate = &C_SignEncryptUpdate
+      # functionList.C_DecryptVerifyUpdate = &C_DecryptVerifyUpdate
+      functionList.C_GenerateKey = &C_GenerateKey
+      functionList.C_GenerateKeyPair = &C_GenerateKeyPair
+      functionList.C_WrapKey = &C_WrapKey
+      functionList.C_UnwrapKey = &C_UnwrapKey
+      functionList.C_DeriveKey = &C_DeriveKey
+      functionList.C_SeedRandom = &C_SeedRandom
+      functionList.C_GenerateRandom = &C_GenerateRandom
+      # functionList.C_GetFunctionStatus = &C_GetFunctionStatus
+      # functionList.C_CancelFunction = &C_CancelFunction
+      # functionList.C_WaitForSlotEvent = &C_WaitForSlotEvent
+
+    ppFunctionList[0] = functionList
+  except:
+    print("Unhandled exception")
+    return CKR_FUNCTION_FAILED
 
 cdef public CK_RV _C_Initialize(void *flags):
     try:
-        print("Initialize")
+        print("C_Initialize")
     except:
         LOGGER.exception("Unhandled exception")
         return CKR_FUNCTION_FAILED
@@ -20,7 +107,7 @@ cdef public CK_RV _C_Initialize(void *flags):
 
 cdef public CK_RV _C_Finalize(void *flags):
     try:
-        print("Finalize")
+        print("C_Finalize")
     except:
         LOGGER.exception("Unhandled exception")
         return CKR_FUNCTION_FAILED
